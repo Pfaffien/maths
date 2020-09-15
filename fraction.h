@@ -1,11 +1,9 @@
 #ifndef _FRACTION_H_
 #define _FRACTION_H_
 
-// TODO: amélioration des opérations (comparaisons et autres) après avoir créé
-// une fonction qui convertit un flottant en fraction
-
 #include <iostream>
 #include <cmath>
+#include <vector>
 #include <cassert>
 
 #define assertm(exp, msg) assert((msg, exp))
@@ -90,19 +88,14 @@ namespace frac {
         Fraction<T1, T2> operator+(const Fraction<T1, T2>&);
 
         /*
-         * Increment postfix version
-         */
-        void operator++(int);
-
-        /*
          * Addition shortcut with a number of type T1
          */
-        void operator+=(T1);
+        Fraction<T1, T2> &operator+=(T1);
 
         /*
          * Adition shortcut with a fraction
          */
-        void operator+=(const Fraction<T1, T2>&);
+        Fraction<T1, T2> &operator+=(const Fraction<T1, T2>&);
         
         /*
          * Subtraction with a number of type T1
@@ -115,19 +108,14 @@ namespace frac {
         Fraction<T1, T2> operator-(const Fraction<T1, T2>&);
 
         /*
-         * Decrement postfix version
-         */
-        void operator--(int);
-
-        /*
          * Subtraction shortcut with a number of type T1
          */
-        void operator-=(T1);
+        Fraction<T1, T2> &operator-=(T1);
 
         /*
          * Subtraction shortcut with a fraction
          */
-        void operator-=(const Fraction<T1, T2>&);
+        Fraction<T1, T2> &operator-=(const Fraction<T1, T2>&);
 
         /*
          * Product with a number of type T1
@@ -142,12 +130,12 @@ namespace frac {
         /*
          * Product shortcut with a number of type T1
          */
-        void operator*=(T1);
+        Fraction<T1, T2> &operator*=(T1);
 
         /*
          * Product shortcut with a fraction
          */
-        void operator*=(const Fraction<T1, T2>&);
+        Fraction<T1, T2> &operator*=(const Fraction<T1, T2>&);
 
         /*
          * Division by a number of type T1
@@ -162,12 +150,12 @@ namespace frac {
         /*
          * Division shortcut with a number of type T1
          */
-        void operator/=(T1);
+        Fraction<T1, T2> &operator/=(T1);
 
         /*
          * Division shortcut with a fraction
          */
-        void operator/=(const Fraction<T1, T2>&);
+        Fraction<T1, T2> &operator/=(const Fraction<T1, T2>&);
 
         /*
          * Equality check with a fraction
@@ -267,8 +255,43 @@ namespace frac {
     template <class T1, class T2>
     Fraction<T1, T2>::Fraction(T2 floating_number)
     {
-        // TODO;
-        Fraction();
+        // Continued fractions
+        T2 alpha(floating_number), theta(0), tmp(0);
+        vector<T1> p = {0, 1, 0};   // Sequence for the numerator
+        vector<T1> q = {1, 0, 0};   // Sequence for the denominator
+        bool complete = false;
+        
+        // Computation of the 
+        while (!complete)
+        {
+            tmp = floor(alpha);
+            theta = alpha - tmp;
+            if (theta > 1e-9)
+                alpha = 1 / theta;
+            else
+                complete = true;
+
+            p[2] = tmp * p[1] + p[0];
+            q[2] = tmp * q[1] + q[0];
+            // Shifting the terms of the sequence
+            p[0] = p[1];
+            p[1] = p[2];
+            q[0] = q[1];
+            q[1] = q[2];
+        }
+
+        // Normalization of the sign of the fraction
+        if ((p[2] >= 0 && q[2] <= 0) || (p[2] <= 0 && q[2] <= 0))
+        {
+            numerator = -p[2];
+            denominator = -q[2];
+        } else {
+            numerator = p[2];
+            denominator = q[2];
+        }
+
+        // Should already be reduced
+        /* this->reduce(); */
     }
 
 
@@ -345,23 +368,17 @@ namespace frac {
 
 
     template <class T1, class T2>
-    void Fraction<T1, T2>::operator++(int n)
-    {
-        numerator += denominator;
-        this->reduce();
-    }
-
-
-    template <class T1, class T2>
-    void Fraction<T1, T2>::operator+=(T1 number)
+    Fraction<T1, T2> &Fraction<T1, T2>::operator+=(T1 number)
     {
         numerator += denominator * number;
         this->reduce();
+
+        return *this;
     }
 
 
     template <class T1, class T2>
-    void Fraction<T1, T2>::operator+=(const Fraction<T1, T2> &frac)
+    Fraction<T1, T2> &Fraction<T1, T2>::operator+=(const Fraction<T1, T2> &frac)
     {
         if (denominator == frac.denominator)
             numerator += frac.numerator;
@@ -371,6 +388,8 @@ namespace frac {
         }
         
         this->reduce();
+
+        return *this;
     }
 
 
@@ -392,23 +411,17 @@ namespace frac {
 
 
     template <class T1, class T2>
-    void Fraction<T1, T2>::operator--(int n)
-    {
-        numerator -= denominator;
-        this->reduce();
-    }
-
-
-    template <class T1, class T2>
-    void Fraction<T1, T2>::operator-=(T1 number)
+    Fraction<T1, T2> &Fraction<T1, T2>::operator-=(T1 number)
     {
         numerator -= denominator * number;
         this->reduce();
+
+        return *this;
     }
 
 
     template <class T1, class T2>
-    void Fraction<T1, T2>::operator-=(const Fraction<T1, T2> &frac)
+    Fraction<T1, T2> &Fraction<T1, T2>::operator-=(const Fraction<T1, T2> &frac)
     {
         if (denominator == frac.denominator)
             numerator -= frac.numerator;
@@ -418,6 +431,8 @@ namespace frac {
         }
 
         this->reduce();
+
+        return *this;
     }
 
 
@@ -437,20 +452,24 @@ namespace frac {
 
 
     template <class T1, class T2>
-    void Fraction<T1, T2>::operator*=(T1 number)
+    Fraction<T1, T2> &Fraction<T1, T2>::operator*=(T1 number)
     {
         numerator *= number;
         this->reduce();
+
+        return *this;
     }
 
 
     template <class T1, class T2>
-    void Fraction<T1, T2>::operator*=(const Fraction<T1, T2> &frac)
+    Fraction<T1, T2> &Fraction<T1, T2>::operator*=(const Fraction<T1, T2> &frac)
     {
         numerator *= frac.numerator;
         denominator *= frac.denominator;
 
         this->reduce();
+
+        return *this;
     }
 
 
@@ -472,22 +491,27 @@ namespace frac {
 
 
     template <class T1, class T2>
-    void Fraction<T1, T2>::operator/=(T1 number)
+    Fraction<T1, T2> &Fraction<T1, T2>::operator/=(T1 number)
     {
         assertm(number != 0, "Error: division by zero");
         denominator *= number;
+
         this->reduce();
+
+        return *this;
     }
 
 
     template <class T1, class T2>
-    void Fraction<T1, T2>::operator/=(const Fraction<T1, T2> &frac)
+    Fraction<T1, T2> &Fraction<T1, T2>::operator/=(const Fraction<T1, T2> &frac)
     {
         assertm(frac.numerator != 0, "Error: division by zero");
         numerator *= frac.denominator;
         denominator *= frac.numerator;
 
         this->reduce();
+
+        return *this;
     }
 
 

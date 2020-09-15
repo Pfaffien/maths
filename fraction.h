@@ -9,14 +9,11 @@
 #define assertm(exp, msg) assert((msg, exp))
 
 
-using namespace std;
-
-
 namespace frac {
     // Instantiations
     template <class T1, class T2> class Fraction;
-    template <class T1, class T2> ostream &operator<<(ostream&, const Fraction<T1, T2>&);
-    template <class T1, class T2> istream &operator>>(istream&, Fraction<T1, T2>&);
+    template <class T1, class T2> std::ostream &operator<<(std::ostream&, const Fraction<T1, T2>&);
+    template <class T1, class T2> std::istream &operator>>(std::istream&, Fraction<T1, T2>&);
 
 
     // Declaration
@@ -24,8 +21,8 @@ namespace frac {
     class Fraction
     {
         // Stream operators overloading
-        friend ostream &operator<< <T1, T2>(ostream&, const Fraction<T1, T2>&);
-        friend istream &operator>> <T1, T2>(istream&, Fraction<T1, T2>&);
+        friend std::ostream &operator<< <T1, T2>(std::ostream&, const Fraction<T1, T2>&);
+        friend std::istream &operator>> <T1, T2>(std::istream&, Fraction<T1, T2>&);
 
     private:
         T1 numerator;
@@ -108,6 +105,11 @@ namespace frac {
         Fraction<T1, T2> operator-(const Fraction<T1, T2>&);
 
         /*
+         * Taking the opposite
+         */
+        Fraction<T1, T2> operator-();
+
+        /*
          * Subtraction shortcut with a number of type T1
          */
         Fraction<T1, T2> &operator-=(T1);
@@ -187,7 +189,7 @@ namespace frac {
 
     // Implementation
     template <class T1, class T2>
-    ostream &operator<<(ostream &o, const Fraction<T1, T2> &frac)
+    std::ostream &operator<<(std::ostream &o, const Fraction<T1, T2> &frac)
     {
         // More convenient display for integers
         if (frac.denominator == 1)
@@ -200,13 +202,13 @@ namespace frac {
 
 
     template <class T1, class T2>
-    istream &operator>>(istream &i, Fraction<T1, T2> &frac)
+    std::istream &operator>>(std::istream &i, Fraction<T1, T2> &frac)
     {
         T1 num, denom;
 
-        cout << "Numerator: ";
+        std::cout << "Numerator: ";
         i >> num;
-        cout << "Denominator: ";
+        std::cout << "Denominator: ";
         i >> denom;
 
         frac = Fraction<T1, T2>(num, denom);
@@ -252,28 +254,34 @@ namespace frac {
     }
 
 
+    // Try to add some assertion to check if out of bound
+    // to avoid being stuck in an infinite loop
+    // Or add a max_iter number or check if there is a change of sign
+    // of the numerator or denominator
     template <class T1, class T2>
     Fraction<T1, T2>::Fraction(T2 floating_number)
     {
         // Continued fractions
         T2 alpha(floating_number), theta(0), tmp(0);
-        vector<T1> p = {0, 1, 0};   // Sequence for the numerator
-        vector<T1> q = {1, 0, 0};   // Sequence for the denominator
+        std::vector<T1> p = {0, 1, 0};   // Sequence for the numerator
+        std::vector<T1> q = {1, 0, 0};   // Sequence for the denominator
         bool complete = false;
         
-        // Computation of the 
         while (!complete)
         {
+            // Computation of the continued fraction
             tmp = floor(alpha);
             theta = alpha - tmp;
-            if (theta > 1e-9)
+            if (theta > 1e-9)   // Precision for theta to be zero
                 alpha = 1 / theta;
             else
                 complete = true;
 
+            // Computation of the numerator and denominator
             p[2] = tmp * p[1] + p[0];
             q[2] = tmp * q[1] + q[0];
-            // Shifting the terms of the sequence
+
+            // Shifting the terms of the sequence (recurring of order 2)
             p[0] = p[1];
             p[1] = p[2];
             q[0] = q[1];
@@ -289,9 +297,6 @@ namespace frac {
             numerator = p[2];
             denominator = q[2];
         }
-
-        // Should already be reduced
-        /* this->reduce(); */
     }
 
 
@@ -407,6 +412,13 @@ namespace frac {
             return Fraction(numerator - frac.numerator, denominator);
         else
             return Fraction(numerator * frac.denominator - denominator * frac.numerator, denominator * frac.denominator);
+    }
+
+
+    template <class T1, class T2>
+    Fraction<T1, T2> Fraction<T1, T2>::operator-()
+    {
+        return Fraction(-numerator, denominator);
     }
 
 
@@ -556,39 +568,7 @@ namespace frac {
     {
         return !(*this > frac);
     }
-
-
-    // Mathematical operations
-    template <class T1, class T2>
-    T1 ceil(const Fraction<T1, T2> &frac)
-    {
-        T2 value = frac.evaluate();
-        return std::ceil(value);
-    }
-
-    
-    template <class T1, class T2>
-    T1 floor(const Fraction<T1, T2> &frac)
-    {
-        T2 value = frac.evaluate();
-        return std::floor(value);
-    }
-
-
-    template <class T1, class T2>
-    T1 round(Fraction<T1, T2> frac)
-    {
-        T1 tmp = floor(frac);
-        Fraction<T1, T2> diff = frac - tmp;
-        T2 value = diff.evaluate();
-
-        if (value < 0.5)
-            return tmp;
-        else
-            return ceil(frac);
-    }
-
-}   /*end namespace frac*/
+}
 
 
 // Type shortcuts

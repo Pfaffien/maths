@@ -1,193 +1,290 @@
 #ifndef _FRACTION_H_
 #define _FRACTION_H_
 
+/**
+ * \file fraction.h
+ * \author Thomas BAUER
+ * \date September 14, 2020
+ *
+ * Template class implementing rational numbers in frational form
+ */
+
 #include <iostream>
 #include <cmath>
 #include <vector>
 #include <cassert>
 
+/**
+ * \brief Shortcut for assertion with a message
+ * \def assertm(exp, msg)
+ * \param exp Expression to be checked for the assertion
+ * \param msg Message to be printed if assertion error
+ */
 #define assertm(exp, msg) assert((msg, exp))
 
 
-namespace frac {
-    // Instantiations
+/**
+ * \namespace frac
+ * \brief Namespace grouping the class Fraction and mathematical functions on rationals
+ */
+namespace frac
+{
+    /******************
+     * Instantiations *
+     ******************/
     template <class T1, class T2> class Fraction;
     template <class T1, class T2> std::ostream &operator<<(std::ostream&, const Fraction<T1, T2>&);
     template <class T1, class T2> std::istream &operator>>(std::istream&, Fraction<T1, T2>&);
 
 
-    // Declaration
+
+    /***************
+     * Declaration *
+     ***************/
+
+    /**
+     * \class Fraction
+     * \brief Template class for rational numbers
+     */
     template <class T1, class T2>
     class Fraction
     {
         // Stream operators overloading
-        friend std::ostream &operator<< <T1, T2>(std::ostream&, const Fraction<T1, T2>&);
-        friend std::istream &operator>> <T1, T2>(std::istream&, Fraction<T1, T2>&);
+        
+        /**
+         * \brief Overloading of << operator
+         * \param[in] o Reference to a std::ostream object
+         * \param[in] frac The fraction to be displayed
+         * \return A reference to the modified stream 
+         */
+        friend std::ostream &operator<< <T1, T2>(std::ostream &o, const Fraction<T1, T2> &frac);
+        
+        /**
+         * \brief Overloading of >> operator
+         * \param[in] i Reference to a std::istream object
+         * \param[in] frac Reference to the fraction in which to insert data
+         * \return A reference to the modified stream
+         */
+        friend std::istream &operator>> <T1, T2>(std::istream &i, Fraction<T1, T2> &frac);
 
     private:
         T1 numerator;
         T1 denominator;
 
     public:
-        /*
-         * Default constructor
+        /**
+         * \brief Default constructor
          */
         Fraction();
 
-        /*
-         * Constructor with T input
+        /**
+         * \brief Constructor
+         * \param[in] num Integer of type T1
          */
-        Fraction(T1);
+        Fraction(T1 num);
 
-        /*
-         * Constructor
+        /**
+         * \brief Constructor
+         * \param[in] num Numerator of integer type T1
+         * \param[in] denom Denominator of integer type T1
          */
-        Fraction(T1, T1);
+        Fraction(T1 num, T1 denom);
 
-        /*
-         * Constructor from type T2 to fraction
+        /**
+         * \brief Constructor from number of floating type T2
+         * \param[in] floating_number The floating number to be converted
          */
-        Fraction(T2);
+        Fraction(T2 floating_number);
 
-        /*
-         * Numerator getter
+        /**
+         * \brief Numerator getter
+         * \return The numerator of integer type T1
          */
         T1 getNum() const;
 
-        /*
-         * Denominator getter
+        /**
+         * \brief Denominator getter
+         * \return The denominator of integer type T1
          */
         T1 getDenom() const;
 
-        /*
-         * Reduction to an irreductible fraction
+        /**
+         * \brief Reduction to an irreductible fraction
          */
         void reduce();
 
-        /*
-         * Evaluate the decimal value of the fraction
+        /**
+         * \brief Evaluation of the fraction's value
+         * \return The floating value of type T2
          */
         T2 evaluate() const;
 
-        /*
-         * Equal operator
+        /**
+         * \brief Assignment operator
+         * \param[in] frac The fraction to be assigned
+         * \return The fraction assigned
          */
-        Fraction<T1, T2> &operator=(const Fraction<T1, T2>&);
+        Fraction<T1, T2> &operator=(const Fraction<T1, T2> &frac);
 
-        /*
-         * Addition with a number of type T1
-         */
-        Fraction<T1, T2> operator+(T1);
+        /**
+         * \brief Overloading of + operator
+         * \param[in] number An integer of type T1
+         * \return The new fraction
+        */
+        Fraction<T1, T2> operator+(T1 number);
 
-        /*
-         * Addition with a fraction
+        /**
+         * \brief Overloading of + operator
+         * \param[in] frac The fraction to be added
+         * \return The new fraction
          */
-        Fraction<T1, T2> operator+(const Fraction<T1, T2>&);
+        Fraction<T1, T2> operator+(const Fraction<T1, T2> &frac);
 
-        /*
-         * Addition shortcut with a number of type T1
+        /**
+         * \brief Overloading of += operator
+         * \param[in] number An integer of type T1
+         * \return A reference to the modified fraction
          */
-        Fraction<T1, T2> &operator+=(T1);
+        Fraction<T1, T2> &operator+=(T1 number);
 
-        /*
-         * Adition shortcut with a fraction
+        /**
+         * \brief Overloading of += operator
+         * \param[in] frac The fraction to be added
+         * \return A reference to the modified fraction
          */
-        Fraction<T1, T2> &operator+=(const Fraction<T1, T2>&);
+        Fraction<T1, T2> &operator+=(const Fraction<T1, T2> &frac);
         
-        /*
-         * Subtraction with a number of type T1
+        /**
+         * \brief Overloading of - operator
+         * \param[in] number An integer of type T1
+         * \return The new fraction
          */
-        Fraction<T1, T2> operator-(T1);
+        Fraction<T1, T2> operator-(T1 number);
 
-        /*
-         * Subtraction with a fraction
+        /**
+         * \brief Overloading of - operator
+         * \param[in] frac The fraction to subtract
+         * \return The new fraction
          */
-        Fraction<T1, T2> operator-(const Fraction<T1, T2>&);
+        Fraction<T1, T2> operator-(const Fraction<T1, T2> &frac);
 
-        /*
-         * Taking the opposite
+        /**
+         * \brief Overloading of unary - operator
+         * \return The opposite of the fraction
          */
         Fraction<T1, T2> operator-();
 
-        /*
-         * Subtraction shortcut with a number of type T1
+        /**
+         * \brief Overloading of -= operator
+         * \param[in] number An integer of type T1
+         * \return A reference to the modified fraction
          */
-        Fraction<T1, T2> &operator-=(T1);
+        Fraction<T1, T2> &operator-=(T1 number);
 
-        /*
-         * Subtraction shortcut with a fraction
+        /**
+         * \brief Overloading of -= operator
+         * \param[in] frac The fraction to subtract
+         * \return A reference to the modified fraction
          */
-        Fraction<T1, T2> &operator-=(const Fraction<T1, T2>&);
+        Fraction<T1, T2> &operator-=(const Fraction<T1, T2> &frac);
 
-        /*
-         * Product with a number of type T1
+        /**
+         * \brief Overloading of * operator
+         * \param[in] number An integer of type T1
+         * \return The fraction multiplied by T1
          */
         Fraction<T1, T2> operator*(T1);
 
-        /*
-         * Product with a fraction
+        /**
+         * \brief Overloading of * operator
+         * \param[in] frac The fraction to multiply with
+         * \return The fraction multiplied by frac
          */
-        Fraction<T1, T2> operator*(const Fraction<T1, T2>&);
+        Fraction<T1, T2> operator*(const Fraction<T1, T2> &frac);
 
-        /*
-         * Product shortcut with a number of type T1
+        /**
+         * \brief Overloading of *= operator
+         * \param[in] number An integer of type T1
+         * \return A reference to the new fraction
          */
-        Fraction<T1, T2> &operator*=(T1);
+        Fraction<T1, T2> &operator*=(T1 number);
 
-        /*
-         * Product shortcut with a fraction
+        /**
+         * \brief Overloading of *= operator
+         * \param[in] frac The fraction to multiply with
+         * \return A reference to the new fraction
          */
-        Fraction<T1, T2> &operator*=(const Fraction<T1, T2>&);
+        Fraction<T1, T2> &operator*=(const Fraction<T1, T2> &frac);
 
-        /*
-         * Division by a number of type T1
+        /**
+         * Overloading of / operator
+         * \param[in] number An integer of type T1
+         * \return The fraction divided by number
          */
-        Fraction<T1, T2> operator/(T1);
+        Fraction<T1, T2> operator/(T1 number);
 
-        /*
-         * Division by a fraction
+        /**
+         * \brief Overloading of / operator
+         * \param[in] frac The fraction to divide by
+         * \return The fraction divided by frac
          */
-        Fraction<T1, T2> operator/(const Fraction<T1, T2>&);
+        Fraction<T1, T2> operator/(const Fraction<T1, T2> &frac);
 
-        /*
-         * Division shortcut with a number of type T1
+        /**
+         * \brief Overloading of /= operator
+         * \param[in] number An integer of type T1
+         * \return A reference to the new fraction
          */
-        Fraction<T1, T2> &operator/=(T1);
+        Fraction<T1, T2> &operator/=(T1 number);
 
-        /*
-         * Division shortcut with a fraction
+        /**
+         * \brief Overloading of /= operator
+         * \param[in] frac The fraction to divide by
+         * \return A reference to the new fraction
          */
-        Fraction<T1, T2> &operator/=(const Fraction<T1, T2>&);
+        Fraction<T1, T2> &operator/=(const Fraction<T1, T2> &frac);
 
-        /*
-         * Equality check with a fraction
+        /**
+         * \brief Overloading of == operator
+         * \param[in] frac The fraction to be check
+         * \return True if both fractions are equal, else False
          */
-        bool operator==(const Fraction<T1, T2>&);
+        bool operator==(const Fraction<T1, T2> &frac);
 
-        /*
-         * Greater check
+        /**
+         * \brief Overloading of > operator
+         * \param[in] frac The fraction to be checked
+         * \return True if fraction greater than frac, else False
          */
-        bool operator>(const Fraction<T1, T2>&);
+        bool operator>(const Fraction<T1, T2> &frac);
 
-        /*
-         * Greater or equal check
+        /**
+         * \brief Overloading or >= operator
+         * \param[in] frac The fraction to be checked
+         * \return True if fraction greater than or equa to frac, else False
          */
-        bool operator>=(const Fraction<T1, T2>&);
+        bool operator>=(const Fraction<T1, T2> &frac);
 
-        /*
-         * Less check
+        /**
+         * Overloading of < operator
+         * \param[in] frac The fraction to be checked
+         * \return True if fraction less than frac, else False
          */
-        bool operator<(const Fraction<T1, T2>&);
+        bool operator<(const Fraction<T1, T2> &frac);
 
-        /*
-         * Less or equal check
+        /**
+         * \brief Overloading of <= operator
+         * \param[in] frac The fraction to be checked
+         * \return True if fraction less than or equal to frac, else False
          */
-        bool operator<=(const Fraction<T1, T2>&);
+        bool operator<=(const Fraction<T1, T2> &frac);
     };
 
 
 
-    // Implementation
+    /******************
+     * Implementation *
+     ******************/
     template <class T1, class T2>
     std::ostream &operator<<(std::ostream &o, const Fraction<T1, T2> &frac)
     {
@@ -234,7 +331,7 @@ namespace frac {
         this->reduce();
     }
 
-
+    
     template <class T1, class T2>
     Fraction<T1, T2>::Fraction(T1 num, T1 denom)
     {
@@ -254,7 +351,7 @@ namespace frac {
     }
 
 
-    // Try to add some assertion to check if out of bound
+    // TODO: add some assertion to check if out of bound
     // to avoid being stuck in an infinite loop
     // Or add a max_iter number or check if there is a change of sign
     // of the numerator or denominator
@@ -315,21 +412,6 @@ namespace frac {
 
 
     template <class T1, class T2>
-    Fraction<T1, T2> &Fraction<T1, T2>::operator=(const Fraction<T1, T2> &frac)
-    {
-        if (this != &frac)
-        {
-            numerator = frac.numerator;
-            denominator = frac.denominator;
-        }
-
-        this->reduce();
-
-        return *this;
-    }
-
-
-    template <class T1, class T2>
     void Fraction<T1, T2>::reduce()
     {
         // Using Euclide's algorithm
@@ -352,6 +434,21 @@ namespace frac {
     T2 Fraction<T1, T2>::evaluate() const
     {
         return (T2) numerator / denominator;
+    }
+
+
+    template <class T1, class T2>
+    Fraction<T1, T2> &Fraction<T1, T2>::operator=(const Fraction<T1, T2> &frac)
+    {
+        if (this != &frac)
+        {
+            numerator = frac.numerator;
+            denominator = frac.denominator;
+        }
+
+        this->reduce();
+
+        return *this;
     }
 
 
@@ -571,11 +668,14 @@ namespace frac {
 }
 
 
-// Type shortcuts
-typedef frac::Fraction<int, float> FractionIF;
-typedef frac::Fraction<int, double> FractionID;
-typedef frac::Fraction<long int, float> FractionLF;
-typedef frac::Fraction<long int, double> FractionLD;
+
+/******************
+ * Type shortcuts *
+ ******************/
+typedef frac::Fraction<int, float> FractionIF;          /*!< Fraction of int whose value is evaluated in float precision*/
+typedef frac::Fraction<int, double> FractionID;         /*!< Fraction of int whose value is evaluated in double precision */
+typedef frac::Fraction<long int, float> FractionLF;     /*!< Fraction of long int whose value is evaluated in float precision */
+typedef frac::Fraction<long int, double> FractionLD;    /*!< Fraction of long int whose value is evaluated in double precision */
 
 
 #endif  /*_FRACTION_H_*/

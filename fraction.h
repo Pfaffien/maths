@@ -68,8 +68,8 @@ namespace frac
         friend std::istream &operator>> <T1, T2>(std::istream &i, Fraction<T1, T2> &frac);
 
     private:
-        T1 numerator;
-        T1 denominator;
+        T1 numerator;       /*!< Numerator of integer type T1 */
+        T1 denominator;     /*!< Denominator of integer type T1 */
 
     public:
         /**
